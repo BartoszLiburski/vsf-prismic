@@ -1,0 +1,19 @@
+{
+  "name": "vsf-prismic",
+  "version": "1.0.0",
+  "description": "Headless Prismic CMS implementation to Vue-storefront",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BartoszLiburski/vsf-prismic.git"
+  },
+  "author": "Bartosz Liburski <bliburski@divante.pl> (https://github.com/BartoszLiburski)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BartoszLiburski/vsf-prismic/issues"
+  },
+  "homepage": "https://github.com/BartoszLiburski/vsf-prismic#readme"
+}
