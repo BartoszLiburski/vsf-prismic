@@ -1,11 +1,9 @@
 import extensionStore from './store'
-import extensionRoutes from './router'
 
 const EXTENSION_KEY = 'prismic-cms'
 
 export default function (app, router, store, config) {
-  router.addRoutes(extensionRoutes) // add custom routes
-  store.registerModule(EXTENSION_KEY, extensionStore) // add custom store
+  store.registerModule(EXTENSION_KEY, extensionStore)
 
-  return {EXTENSION_KEY, extensionRoutes, extensionStore}
+  return {EXTENSION_KEY, extensionStore}
 }
