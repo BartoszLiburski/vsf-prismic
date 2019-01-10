@@ -1,7 +1,7 @@
 # CMS Prismic data extension
 Now you can plug headless CMS to your vue storefront
 
-#BEFORE USE!
+# BEFORE USE!
 1. Add line: `require('src/extensions/cms-prismic/index.js')` in file: `vue-storefront/src/extensions/index.js`
 or for VSF 1.4: `extensionList.push(require('src/extensions/cms-prismic/index.js'))`
 2. Make sure that in `vue-storefront-api` repo, the `cms-prismic` extension is installed
@@ -13,7 +13,7 @@ or for VSF 1.4: `extensionList.push(require('src/extensions/cms-prismic/index.js
     "contentIdFilter": "http://localhost:8080/api/ext/cms-prismic/index/?id={{contentId}}&filter={{filter}}&filter_option={{filterOption}}"
   }
 ```
-#To display Cms data
+# To display Cms data
 To display Cms Block import CmsData component and use it in template:
 
 `import CmsPrismic from '@vue-storefront/extension-cms-prismic/components/CmsPrismic'`
