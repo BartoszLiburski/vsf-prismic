@@ -1,7 +1,7 @@
 {
   "name": "@vue-storefront/extension-cms-prismic",
-  "version": "0.0.0",
-  "description": "Extension to display content from headless CMS Prismic",
+  "version": "0.1.0",
+  "description": "Extension to display content from headless CMS Prismic, now using Elastic Search",
   "license": "MIT",
   "main": "index.js",
   "scripts": {

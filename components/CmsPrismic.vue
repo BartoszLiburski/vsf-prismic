@@ -4,7 +4,7 @@
       {{ cms }}
     </div>
     <div v-else>
-      Loading content...
+      {{ $t('Loading content...') }}
     </div>
   </div>
 </template>
@@ -18,7 +18,9 @@ export default {
       {
         type: this.type,
         orderings: this.orderings,
-        contentId: this.contentId
+        contentId: this.contentId,
+        filter: this.filter,
+        filterOption: this.filterOption
       }
     ).then((res) => {
       this.cms = res
@@ -39,11 +41,23 @@ export default {
       type: String,
       default: null,
       required: false
+    },
+    filter: {
+      type: String,
+      default: null,
+      required: false
+    },
+    filterOption: {
+      type: String,
+      default: null,
+      required: false
     }
   },
   data () {
     return {
-      cms: null
+      cms: {
+        body: []
+      }
     }
   }
 }

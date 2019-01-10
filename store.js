@@ -1,7 +1,5 @@
 import fetch from 'isomorphic-fetch'
 import config from 'config'
-import * as localForage from 'localforage'
-import UniversalStorage from './../../../core/store/lib/storage'
 import Vue from 'vue'
 
 const headers = {
@@ -9,62 +7,63 @@ const headers = {
   headers: {'Content-Type': 'application/json'},
   mode: 'cors'
 }
-const cmsContent = new UniversalStorage(localForage.createInstance({
-  name: 'shop/prismic-cms',
-  storeName: 'cmsContent'
-}))
-let url
-let cacheKey
 // actions
 const actions = {
-  loadPrismicPage (context, {type, orderings, contentId}) {
-    if (Vue.prototype.$localCache['shop/prismic-cms']) {
-      Vue.prototype.$localCache['shop/prismic-cms'] = cmsContent
-    }
+  loadPrismicPage (context, {type, orderings, contentId, filter, filterOption}) {
+    // set all needed variables
+    let url
+    let cacheKey
     if (type && orderings) {
       url = (config.prismic.typeAndTag)
         .replace('{{type}}', type)
         .replace('{{orderings}}', orderings)
       cacheKey = type + '&' + orderings
-    } else if (contentId) {
+    } else if (contentId && filter) {
+      url = (config.prismic.contentIdFilter)
+        .replace('{{contentId}}', contentId)
+        .replace('{{filter}}', filter)
+        .replace('{{filterOption}}', filterOption)
+      cacheKey = contentId + '&f:' + filterOption
+    } else if (contentId && !filter) {
       url = (config.prismic.contentId)
         .replace('{{contentId}}', contentId)
-      cacheKey = 'id:' + contentId
+      cacheKey = contentId
     } else {
       return false
     }
-    const cache = Vue.prototype.$localCache['shop/prismic-cms']
-    return new Promise((resolve, reject) => {
-      cache.getItem(cacheKey, (err, result) => {
-        if (err) {
-          reject(err)
-        }
-        if (result) {
-          resolve(result)
-        } else {
-          let json
-          fetch(url, headers)
-            .then((response) => {
-              return response.text()
+    const cache = Vue.prototype.$db['cms-prismic']
+    // fetch every time we are online
+    if (navigator.onLine) {
+      return fetch(url, headers)
+        .then((response) => {
+          return response.json()
+        })
+        .then((json) => {
+          if (!json.result) {
+            console.error('Nothing to save in cache')
+            return false
+          }
+          cache.setItem(cacheKey, json.result)
+            .catch((err) => {
+              console.error('CMS cache error' + err)
             })
-            .then((res) => {
-              json = JSON.parse(res)
-              if (!json.result) {
-                console.error('Nothing to save in cache')
-                resolve(false)
-              }
-              cache.setItem(cacheKey, json.result[0].data)
-                .catch((err) => {
-                  console.error('CMS cache error' + err)
-                })
-              resolve(json.result[0].data)
-            })
-            .catch((e) => {
-              console.log('CMS fetch error:' + e)
-            })
-        }
+          return json.result
+        })
+        .catch((e) => {
+          console.error('CMS fetch error:' + e)
+        })
+    } else { // if offline just check if it exists in cache
+      return new Promise((resolve, reject) => {
+        cache.getItem(cacheKey, (err, result) => {
+          if (err) {
+            reject(err)
+          }
+          if (result) {
+            resolve(result)
+          }
+        })
       })
-    })
+    }
   }
 }
 
