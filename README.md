@@ -1,40 +1,76 @@
-# CMS Prismic data extension
-Now you can plug headless CMS to your vue storefront
+# CMS Prismic data module
+Now you can plug headless CMS to your vue storefront.
 
-# BEFORE USE!
-1. Add line: `require('src/extensions/cms-prismic/index.js')` in file: `vue-storefront/src/extensions/index.js`
-or for VSF 1.4: `extensionList.push(require('src/extensions/cms-prismic/index.js'))`
-2. Make sure that in `vue-storefront-api` repo, the `cms-prismic` extension is installed
-3. Add routes to your config/local.json file ( if you don't have one, copy default.json and name it local.json )
+#BEFORE USE!
+1. Make sure that in `vue-storefront-api` repo, the `cms-prismic` extension is installed
+
+#To display Cms data
+**First fetch data to store (vuex) you want,** using prismic store like this:
+
+`store.dispatch('prismic/load', {type: 'cms_page'}`
+
+Look on second parameter of store.dispatch, it is your content identifier
+You can use (note that parameters don't mix):
+1. contentId 
+Prismic data Id
+fetch like this: `store.dispatch('prismic/load', {contentId: 'W5oNzSAAANpzjTfA'}`
+
+2. Type
+Type of prismic data -> can be multiple documents
+fetch like this: `store.dispatch('prismic/load', {type: 'cms_page'}`
+
+3. Tag
+Search by one of tag of prismic documents tags 
+fetch like this: `store.dispatch('prismic/load', {tag: 'sale'}`
+
+**Then use the data in components using contentMap getter**
+1. contentId `this.$store.getters['prismic/contentMap']['W5oNzSAAANpzjTfA']`
+2. type `this.$store.getters['prismic/contentMap']['cms_page']`
+3. tag **NOTE the # sign** before tag name `this.$store.getters['prismic/contentMap']['#sale']`
+
+**example of use:**
 ```
-"prismic": {
-    "typeAndTag": "http://localhost:8080/api/ext/cms-prismic/index/?type={{type}}&tags={{orderings}}",
-    "contentId": "http://localhost:8080/api/ext/cms-prismic/index/?id={{contentId}}",
-    "contentIdFilter": "http://localhost:8080/api/ext/cms-prismic/index/?id={{contentId}}&filter={{filter}}&filter_option={{filterOption}}"
+// fetching data
+mounted () {
+ this.$store.dispatch('prismic/load', {
+   type: this.type
+ })
+},
+// registration this fetched data do compute
+computed: {
+  prismicData () {
+    return this.$store.getters[`prismic/contentMap`][id]
   }
+}
+// use in template
+<template>
+  <div v-if="prismicData">
+    {{ prismicData }}
+  </div>
+</template>
 ```
-# To display Cms data
-To display Cms Block import CmsData component and use it in template:
 
-`import CmsPrismic from '@vue-storefront/extension-cms-prismic/components/CmsPrismic'`
+#Async and synchronous data fetching 
+Also you can fetch your data asynchronously, just use asyncData/AsyncDataLoader/serverPrefetch instead of mounted hook
+```
+asyncData ({ store }) {
+  return new Promise((resolve, reject) => {
+    store.dispatch('prismic/load', {
+      type: 'cms_page'
+    }).then(() => {
+      resolve()
+    })
+  })
+}
+```
+#Api side filtering content
+Vue-storefront-api prismic extension comes with methods to write custom filter for downloaded content. For example you want to get Prismic data with id xxx, containing
+article with two parts: when promotion on whole stock is active and normal. It means that you need to create new filter in Vue-storefront-api with name 'promotion'
+and then use it here like this
+`store.dispatch('prismic/load', {contentId: 'W5oNzSAAANpzjTfA', filter: 'promotion', filterOption: 'true'}`
 
-Then display your content by
-1. Type and tag 
- `<cms-prismic :type="'store-page'" :orderings="'store1'"/>`
- using two props:
-- type = type in prismic repository of content
-- orderings = tag of prismic content
+#Mapping json data to html
+You can use `PrismicDOM` from Prismic `https://github.com/prismicio/prismic-dom`
+For more complicated content we suggest writing custom template. Please remember to always check if content is set, using v-if or similar methods. 
 
-2. Content Id 
- `<cms-prismic :content-id="'W5oNzSAAANpzjTfA'"/>`
- using one prop:
-- contentId = id of your content
-
-3. Content Id with filter
-In vuestorefront-api there is option to write your custom filters for content that returns from prismic 
- `<category-slider :content-id="'W-G4GxEAACIAdKrj'" :filter="'category_slide'" :filter-option="12" />`
- using one prop:
-- contentId = id of category slider
-- filter = filter name, it is name of function that will modify return content 
-- filter-option = pass some param to the filter
 ```
