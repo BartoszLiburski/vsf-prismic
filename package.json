@@ -1,8 +1,13 @@
 {
-  "name": "@vue-storefront/vsf-prismic-module",
-  "version": "1.0.0",
+  "name": "vsf-prismic-module",
+  "version": "1.0.1",
   "description": "Prismic implementation for vue storefront, from v 1.0.0 as a module (not extension)",
   "license": "MIT",
-  "main": "index.js"
+  "main": "index.js",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/BartoszLiburski/vsf-prismic-api"
+  },
+  "keywords": ["vue", "vue-storefront", "headless", "prismic", "api"]
 }
 
